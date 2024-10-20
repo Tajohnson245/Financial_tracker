@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Scorerer's: Financial Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <a href="Overview.html">
+            <div class="button" >Overview</div>
+        </a>
+        <a href="Transactions.html">
+            <div class="button" style="background-color: #57CC99;">Transactions</div>
+        </a>
+        <a href="Goals.html">
+            <div class="button">Goals</div>
+        </a>
+        <a href="Trends.html">
+            <div class="button">Trends</div>
+        </a>
+        <a href="">
+            <div class="button">test</div>
+        </a>
+    </div>
+    <div class="mainContainer">
+        <div id=#transactions>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Transaction Id</th>
+                        <th>Account id</th>
+                        <th>Transaction Type</th>
+                        <th>Transaction Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                        <th>Category</th>
+                        <th>Category id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Fetch the transactions from the API
+        fetch('http://localhost:3000/api/transactions')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+                // Clear any existing rows
+                tableBody.innerHTML = ''; 
+                
+                data.forEach(transaction => {
+                    const row = tableBody.insertRow();
+                    row.insertCell(0).textContent = transaction.Transaction_id;   // Transaction ID
+                    row.insertCell(1).textContent = transaction.Account_id;      // Account ID
+                    row.insertCell(2).textContent = transaction.Transaction_type; // Transaction Type
+                    row.insertCell(3).textContent = transaction.Transaction_date; // Transaction Date
+                    row.insertCell(4).textContent = transaction.Description;      // Description
+                    row.insertCell(5).textContent = transaction.Amount;          // Amount
+                    row.insertCell(6).textContent = transaction.Balance;         // Balance
+                    row.insertCell(7).textContent = transaction.Category;        // Category
+                    row.insertCell(8).textContent = transaction.Category_id;     // Category ID
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching transactions:', error);
+            });
+    </script>
+
+</body>
+</html>
