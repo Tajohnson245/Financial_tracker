@@ -50,8 +50,17 @@ a{
     overflow-x: auto;
 }
 
+#transactionSearchForm {
+    background-color: white;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0 20px 15px rgba(0, 0, 0, 0.1);
+    width:25%;
+}
+
 
 table {
+    border-radius: 50px;
     width: 100%; /* Full width */
     border-collapse: collapse; /* Remove double borders */
     margin-top: 20px; /* Space above the table */

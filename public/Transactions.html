@@ -25,6 +25,31 @@
         </a>
     </div>
     <div class="mainContainer">
+        <div id="queries">
+            <form id="transactionSearchForm">
+                <label for="Transaction_id">Transaction ID:</label>
+                <input type="text" id="Transaction_id" name="Transaction_id">
+                <br><br>
+            
+                <label for="Account_id">Account ID:</label>
+                <input type="text" id="Account_id" name="Account_id">
+                <br><br>
+            
+                <label for="Transaction_date">Transaction Date:</label>
+                <input type="date" id="Transaction_date" name="Transaction_date">
+                <br><br>
+            
+                <label for="Description">Description:</label>
+                <input type="text" id="Description" name="Description">
+                <br><br>
+            
+                <label for="Amount">Amount:</label>
+                <input type="text" id="Amount" name="Amount">
+                <br><br>
+            
+                <button type="submit">Search</button>
+            </form>
+        </div>
         <div id=#transactions>
             <table id="transactionsTable">
                 <thead>
@@ -45,7 +70,7 @@
             </table>
         </div>
     </div>
-
+    <script src="scripts.js"></script>
     <script>
         // Fetch the transactions from the API
         fetch('http://localhost:3000/api/transactions')
