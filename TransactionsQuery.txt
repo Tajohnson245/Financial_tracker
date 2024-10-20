@@ -1,3 +1,5 @@
+CREATE TABLE Transactions (     Transaction_id VARCHAR(30) PRIMARY KEY,       Account_id INT,  Transaction_type ENUM('income', 'expense', 'transfer'),     Transaction_date DATETIME,     Description VARCHAR(255),     Amount DECIMAL(10, 2),     Balance DECIMAL(10, 2),     Category VARCHAR(50),     Category_id INT)
+
 
 INSERT INTO `Transactions` VALUES ('20230102MAR3001',1,'expense','2023-01-02 00:00:00','MARATHON PETRO17103 Kent                OH',-30.01,4783.26,'Transportation',4),
 	('20230103Zel67650',1,'expense','2023-01-03 00:00:00','Zelle payment to John Smith',-676.50,4106.76,'Housing',1),
