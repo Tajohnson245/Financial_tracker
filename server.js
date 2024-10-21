@@ -12,6 +12,9 @@ app.use(cors());
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// use express to process json
+app.use(express.json());
+
 // Create a MySQL connection
 const connection = mysql.createConnection({
     host: 'localhost',     // e.g., localhost
@@ -84,5 +87,42 @@ app.get('/api/searchTransactions', (req, res) => {
             return;
         }
         res.json(results); // Send the filtered results as JSON
+    });
+});
+
+// Endpoint to add a new transaction
+app.post('/api/addTransaction', (req, res) => {
+    //console.log(req.body);
+
+    const {
+        Transaction_id,
+        Account_id,
+        Transaction_type,
+        Transaction_date,
+        Description,
+        Amount,
+        Balance,
+        Category,
+        Category_id
+    } = req.body;
+
+    const sql = 'INSERT INTO Transactions (Transaction_id, Account_id, Transaction_type, Transaction_date, Description, Amount, Balance, Category, Category_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+    connection.query(sql, [
+        Transaction_id,
+        Account_id,
+        Transaction_type,
+        Transaction_date,
+        Description,
+        Amount,
+        Balance,
+        Category,
+        Category_id
+    ], (err, result) => {
+        if (err) {
+            console.error('Error inserting into database:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        res.json({ success: true, message: 'Transaction added successfully' });
     });
 });

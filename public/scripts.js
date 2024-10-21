@@ -48,3 +48,50 @@ document.getElementById("transactionSearchForm").addEventListener('submit', func
         console.error('Error fetching transactions:', error);
     });
 });
+
+document.getElementById('newTransactionForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    // Collect the form data
+    const formData = {
+        Account_id: document.getElementById('newAccount_id').value,
+        Transaction_type: document.getElementById('newTransaction_type').value,
+        Transaction_date: document.getElementById('newTransaction_date').value,
+        Description: document.getElementById('newDescription').value,
+        Amount: document.getElementById('newAmount').value,
+        Balance: document.getElementById('newBalance').value,
+        Category: document.getElementById('newCategory').value,
+        Category_id: document.getElementById('newCategory_id').value
+    };
+
+    // Generate the Transaction_id (format: YYYYMMDD + first 3 characters of description + Amount * 100)
+    const datePart = formData.Transaction_date.replace(/-/g, ''); // Removes hyphens from the date
+    const descriptionPart = formData.Description.substring(0, 3).toUpperCase(); // First 3 letters of description
+    const amountPart = Math.abs(parseFloat(formData.Amount) * 100); // Convert Amount to integer cents
+
+    formData.Transaction_id = `${datePart}${descriptionPart}${amountPart}`;
+
+    // Log the formData to check the generated Transaction_id
+    console.log('Form Data with Transaction_id:', formData);
+    console.log('Post-Stringify:', JSON.stringify(formData));
+
+    // Send the form data to the backend
+    fetch('http://localhost:3000/api/addTransaction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Transaction added successfully');
+        } else {
+            alert('Error adding transaction');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
