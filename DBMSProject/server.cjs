@@ -52,8 +52,14 @@ app.listen(port, () => {
 
 // transactions query from search form
 app.get("/api/searchTransactions", (req, res) => {
-  const { Transaction_id, Account_id, Transaction_date, Description, Amount } =
-    req.query;
+  const {
+    Transaction_id,
+    Transaction_type,
+    Account_id,
+    Transaction_date,
+    Description,
+    Amount,
+  } = req.query;
 
   let sql = "SELECT * FROM Transactions WHERE 1=1";
   const queryParams = [];
@@ -61,6 +67,10 @@ app.get("/api/searchTransactions", (req, res) => {
   if (Transaction_id && Transaction_id.trim() !== "") {
     sql += " AND Transaction_id = ?";
     queryParams.push(Transaction_id.trim());
+  }
+  if (Transaction_type && Transaction_type.trim() !== "") {
+    sql += " AND Transaction_type = ?";
+    queryParams.push(Transaction_type.trim());
   }
   if (Account_id && Account_id.trim() !== "") {
     sql += " AND Account_id = ?";
@@ -79,10 +89,6 @@ app.get("/api/searchTransactions", (req, res) => {
     queryParams.push(Amount.trim());
   }
 
-  // Log the query and parameters for debugging
-  console.log("SQL Query:", sql);
-  console.log("Query Params:", queryParams);
-
   // Execute the query
   connection.query(sql, queryParams, (err, results) => {
     if (err) {
@@ -90,8 +96,7 @@ app.get("/api/searchTransactions", (req, res) => {
       res.status(500).send("Error fetching transactions");
       return;
     }
-    console.log("Query results:", results);
-    res.json(results); // Send the filtered results as JSON
+    res.json(results);
   });
 });
 

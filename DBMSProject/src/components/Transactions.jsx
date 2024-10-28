@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 const Transactions = () => {
   const [formData, setFormData] = useState({
     Transaction_id: "",
+    Transaction_type: "",
+    Transaction_date: "",
+    Description: "",
+    Amount: "",
   });
   const [allTransactions, setAllTransactions] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -31,16 +35,24 @@ const Transactions = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const queryParams = new URLSearchParams({
+      Transaction_id: formData.Transaction_id.trim(),
+      Transaction_type: formData.Transaction_type.trim(),
+      Transaction_date: formData.Transaction_date.trim(),
+      Description: formData.Description.trim(),
+      Amount: formData.Amount.trim(),
+    });
+
     try {
       const response = await fetch(
-        `http://localhost:3000/api/searchTransactions?Transaction_id=${formData.Transaction_id.trim()}`
+        `http://localhost:3000/api/searchTransactions?${queryParams.toString()}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch transactions.");
       }
       const data = await response.json();
-      setTransactions(data); // Update the table with the search results
-      setError(null); // Clear any previous errors
+      setTransactions(data);
+      setError(null);
     } catch (err) {
       setError(err.message);
       setTransactions(allTransactions); // Reset to all transactions on error
@@ -57,32 +69,80 @@ const Transactions = () => {
 
   return (
     <div className="flex">
-      {/* Main Container */}
-      <div className="flex-1 bg-[#80ED99] p-5 h-screen overflow-auto">
-        {/* Search Form */}
+      <div className="bg-[#80ED99] p-5">
         <form
           className="bg-white p-5 rounded-xl shadow-md mb-5"
           onSubmit={handleSubmit}
         >
-          <label>
-            Transaction ID:
-            <input
-              className="border rounded p-2 block w-full mt-1"
-              type="text"
-              name="Transaction_id"
-              value={formData.Transaction_id}
-              onChange={handleChange}
-            />
-          </label>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label>
+                Transaction ID:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="text"
+                  name="Transaction_id"
+                  value={formData.Transaction_id}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Transaction Type:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="text"
+                  name="Transaction_type"
+                  value={formData.Transaction_type}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Transaction Date:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="date"
+                  name="Transaction_date"
+                  value={formData.Transaction_date}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Description:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="text"
+                  name="Description"
+                  value={formData.Description}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Amount:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="text"
+                  name="Amount"
+                  value={formData.Amount}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+          </div>
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
             Search
           </button>
         </form>
 
-        {/* Display error message if any */}
         {error && <div className="text-red-500 mt-3">{error}</div>}
 
-        {/* Display the results in a table */}
         <table className="w-full border-collapse bg-white rounded-lg shadow-lg">
           <thead>
             <tr className="bg-[#22577A] text-white">
