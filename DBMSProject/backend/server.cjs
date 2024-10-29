@@ -33,6 +33,11 @@ connection.connect((err) => {
   console.log("Connected to the database");
 });
 
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+
 // API endpoint to get all transactions
 app.get("/api/transactions", (req, res) => {
   connection.query("SELECT * FROM Transactions", (err, results) => {
@@ -45,20 +50,18 @@ app.get("/api/transactions", (req, res) => {
   });
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
 // transactions query from search form
 app.get("/api/searchTransactions", (req, res) => {
   const {
     Transaction_id,
-    Transaction_type,
     Account_id,
+    Transaction_type,
     Transaction_date,
     Description,
     Amount,
+    Balance,
+    Category,
+    Category_id,
   } = req.query;
 
   let sql = "SELECT * FROM Transactions WHERE 1=1";
@@ -68,14 +71,15 @@ app.get("/api/searchTransactions", (req, res) => {
     sql += " AND Transaction_id = ?";
     queryParams.push(Transaction_id.trim());
   }
-  if (Transaction_type && Transaction_type.trim() !== "") {
-    sql += " AND Transaction_type = ?";
-    queryParams.push(Transaction_type.trim());
-  }
   if (Account_id && Account_id.trim() !== "") {
     sql += " AND Account_id = ?";
     queryParams.push(Account_id.trim());
   }
+  if (Transaction_type && Transaction_type.trim() !== "") {
+    sql += " AND Transaction_type = ?";
+    queryParams.push(Transaction_type.trim());
+  }
+
   if (Transaction_date && Transaction_date.trim() !== "") {
     sql += " AND Transaction_date = ?";
     queryParams.push(Transaction_date.trim());
@@ -87,6 +91,18 @@ app.get("/api/searchTransactions", (req, res) => {
   if (Amount && Amount.trim() !== "") {
     sql += " AND Amount = ?";
     queryParams.push(Amount.trim());
+  }
+  if (Balance && Balance.trim() !== "") {
+    sql += " AND Balance = ?";
+    queryParams.push(Balance.trim());
+  }
+  if (Category && Category.trim() !== "") {
+    sql += " AND Category LIKE ?";
+    queryParams.push(`%${Category.trim()}%`);
+  }
+  if (Category_id && Category_id.trim() !== "") {
+    sql += " AND Category_id LIKE ?";
+    queryParams.push(`%${Category_id.trim()}%`);
   }
 
   // Execute the query
@@ -102,8 +118,6 @@ app.get("/api/searchTransactions", (req, res) => {
 
 // Endpoint to add a new transaction
 app.post("/api/addTransaction", (req, res) => {
-  //console.log(req.body);
-
   const {
     Transaction_id,
     Account_id,
