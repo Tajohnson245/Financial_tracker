@@ -157,3 +157,24 @@ app.post("/api/addTransaction", (req, res) => {
     }
   );
 });
+
+// Endpoint to delete a new transaction
+app.delete("/api/deleteTransaction/:Transaction_id", (req, res) => {
+  const { Transaction_id } = req.params;
+  const sql = "DELETE FROM Transactions WHERE Transaction_id = ?";
+
+  connection.query(sql, [Transaction_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting transaction from database:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Transaction not found" });
+    }
+    res.json({ success: true, message: "Transaction deleted successfully" });
+  });
+});

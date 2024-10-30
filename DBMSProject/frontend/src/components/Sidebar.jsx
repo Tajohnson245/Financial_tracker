@@ -33,7 +33,7 @@ const Sidebar = () => {
       </div>
 
       <div className="text-left text-white">
-        <p className="text-lg">© 2023 Financial Tracker</p>
+        <p className="text-lg">© 2024 Financial Tracker</p>
         <p className="text-lg">All rights reserved.</p>
       </div>
     </div>
