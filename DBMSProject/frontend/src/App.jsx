@@ -9,7 +9,7 @@ function App() {
     <Router>
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 p-5 bg-green-200">
+        <div className="flex-1 p-5 ml-72 bg-green-200">
           <Routes>
             <Route path="/overview" element={<div>Overview Page</div>} />
             <Route
