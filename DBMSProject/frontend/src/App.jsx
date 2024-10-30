@@ -7,8 +7,8 @@ import "./index.css";
 function App() {
   return (
     <Router>
+      <Header />
       <div className="flex">
-        <Header />
         <Sidebar />
         <div className="flex-1 p-5 pt-20 ml-72 bg-green-200">
           <Routes>
