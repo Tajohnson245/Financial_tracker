@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-
+import Header from "./components/Header";
 import Transactions from "./components/Transactions";
 import "./index.css";
 
@@ -8,8 +8,9 @@ function App() {
   return (
     <Router>
       <div className="flex">
+        <Header />
         <Sidebar />
-        <div className="flex-1 p-5 ml-72 bg-green-200">
+        <div className="flex-1 p-5 pt-20 ml-72 bg-green-200">
           <Routes>
             <Route path="/overview" element={<div>Overview Page</div>} />
             <Route
