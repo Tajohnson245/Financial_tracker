@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [statusMessage, setStatusMessage] = useState(null);
+  const [statusMessageSearch, setStatusMessageSearch] = useState(null);
+  const [statusMessageAdd, setStatusMessageAdd] = useState(null);
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [formData, setFormData] = useState({
     Transaction_id: "",
     Account_id: "",
@@ -27,6 +29,15 @@ const Transactions = () => {
     Category: "",
     Category_id: "",
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStatusMessageAdd(null);
+      setStatusMessageSearch(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [statusMessageAdd, statusMessageSearch]);
 
   useEffect(() => {
     const fetchAllTransactions = async () => {
@@ -68,7 +79,7 @@ const Transactions = () => {
       }
       const data = await response.json();
       setTransactions(data);
-      setStatusMessage({
+      setStatusMessageSearch({
         type: "success",
         text: "Successful Search!",
       });
@@ -84,7 +95,7 @@ const Transactions = () => {
         Category_id: "",
       });
     } catch (err) {
-      setStatusMessage({
+      setStatusMessageSearch({
         type: "error",
         text: err.message,
       });
@@ -105,7 +116,7 @@ const Transactions = () => {
         throw new Error("Failed to add transaction.");
       }
       const data = await response.json();
-      setStatusMessage({
+      setStatusMessageAdd({
         type: "success",
         text: "Transaction added successfully.",
       });
@@ -121,10 +132,41 @@ const Transactions = () => {
         Category_id: "",
       });
     } catch (err) {
-      setStatusMessage({
+      setStatusMessageAdd({
         type: "error",
         text: err.message,
       });
+    }
+  };
+
+  const deleteTransaction = async () => {
+    const response = await fetch(
+      "http://localhost:3000/api/deleteTransactions",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Transaction_id: selectedTransactions }),
+      }
+    );
+
+    console.log(JSON.stringify({ Transaction_id: selectedTransactions }));
+    console.log(response);
+
+    if (response.ok) {
+      const filteredTransactions = transactions.filter(
+        (transactions) =>
+          !selectedTransactions.includes(transactions.Transaction_id)
+      );
+
+      setTransactions(filteredTransactions);
+
+      setSelectedTransactions([]);
+
+      console.log("Transactions deleted successfully");
+    } else {
+      console.error("Error deleting transactions");
     }
   };
 
@@ -138,16 +180,13 @@ const Transactions = () => {
   const handleChange2 = (e) => {
     const { name, value } = e.target;
 
-    // Only apply formatting if the name is `Transaction_date` and the value is in MM/DD/YYYY format
     if (
       name === "Transaction_date" &&
       value &&
       /^\d{2}\/\d{2}\/\d{4}$/.test(value)
     ) {
-      // Split the date into month, day, and year
       const [month, day, year] = value.split("/");
 
-      // Format to YYYY-MM-DD for backend compatibility
       const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(
         2,
         "0"
@@ -158,12 +197,19 @@ const Transactions = () => {
         [name]: formattedDate,
       });
     } else {
-      // For other fields or if the date is incomplete, just set the value directly
       setFormData2({
         ...formData2,
         [name]: value,
       });
     }
+  };
+
+  const handleSelect = (Transaction_id) => {
+    setSelectedTransactions((prevSelected) =>
+      prevSelected.includes(Transaction_id)
+        ? prevSelected.filter((id) => id !== Transaction_id)
+        : [...prevSelected, Transaction_id]
+    );
   };
 
   return (
@@ -286,6 +332,17 @@ const Transactions = () => {
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
             Search Transaction
           </button>
+          {statusMessageSearch && (
+            <div
+              className={
+                statusMessageSearch.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {statusMessageSearch.text}
+            </div>
+          )}
         </form>
 
         <form
@@ -405,18 +462,19 @@ const Transactions = () => {
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
             Add Transaction
           </button>
+          {statusMessageAdd && (
+            <div
+              className={
+                statusMessageAdd.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {statusMessageAdd.text}
+            </div>
+          )}
         </form>
       </div>
-
-      {statusMessage && (
-        <div
-          className={
-            statusMessage.type === "error" ? "text-red-500" : "text-green-500"
-          }
-        >
-          {statusMessage.text} {/* Only render the text here */}
-        </div>
-      )}
 
       <table className="w-full border-collapse bg-white rounded-lg shadow-lg">
         <thead>
@@ -430,6 +488,14 @@ const Transactions = () => {
             <th className="p-2">Balance</th>
             <th className="p-2">Category</th>
             <th className="p-2">Category Id</th>
+            <th className="p-2">
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded"
+                onClick={deleteTransaction}
+              >
+                Delete
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -448,6 +514,12 @@ const Transactions = () => {
                 <td className="p-2 border">{transaction.Balance}</td>
                 <td className="p-2 border">{transaction.Category}</td>
                 <td className="p-2 border">{transaction.Category_id}</td>
+                <td className="p-2 pl-8 border">
+                  <input
+                    type="checkbox"
+                    onChange={() => handleSelect(transaction.Transaction_id)}
+                  />
+                </td>
               </tr>
             ))
           ) : (
