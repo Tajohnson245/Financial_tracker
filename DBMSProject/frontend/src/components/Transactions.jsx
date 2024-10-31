@@ -4,6 +4,7 @@ const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [statusMessage, setStatusMessage] = useState(null);
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [formData, setFormData] = useState({
     Transaction_id: "",
     Account_id: "",
@@ -128,6 +129,28 @@ const Transactions = () => {
     }
   };
 
+  const deleteTransaction = async () => {
+    const response = await fetch(
+      "http://localhost:3000/api/deleteTransactions",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Transaction_id: selectedTransactions }),
+      }
+    );
+
+    console.log(JSON.stringify({ Transaction_id: selectedTransactions }));
+    console.log(response);
+
+    if (response.ok) {
+      console.log("Transactions deleted successfully");
+    } else {
+      console.error("Error deleting transactions");
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -164,6 +187,14 @@ const Transactions = () => {
         [name]: value,
       });
     }
+  };
+
+  const handleSelect = (Transaction_id) => {
+    setSelectedTransactions((prevSelected) =>
+      prevSelected.includes(Transaction_id)
+        ? prevSelected.filter((id) => id !== Transaction_id)
+        : [...prevSelected, Transaction_id]
+    );
   };
 
   return (
@@ -430,6 +461,14 @@ const Transactions = () => {
             <th className="p-2">Balance</th>
             <th className="p-2">Category</th>
             <th className="p-2">Category Id</th>
+            <th className="p-2">
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded"
+                onClick={deleteTransaction}
+              >
+                Delete
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -448,6 +487,12 @@ const Transactions = () => {
                 <td className="p-2 border">{transaction.Balance}</td>
                 <td className="p-2 border">{transaction.Category}</td>
                 <td className="p-2 border">{transaction.Category_id}</td>
+                <td className="p-2 pl-8 border">
+                  <input
+                    type="checkbox"
+                    onChange={() => handleSelect(transaction.Transaction_id)}
+                  />
+                </td>
               </tr>
             ))
           ) : (
