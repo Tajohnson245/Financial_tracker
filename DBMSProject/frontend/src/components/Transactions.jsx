@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [statusMessage, setStatusMessage] = useState(null);
+  const [statusMessageSearch, setStatusMessageSearch] = useState(null);
+  const [statusMessageAdd, setStatusMessageAdd] = useState(null);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [formData, setFormData] = useState({
     Transaction_id: "",
@@ -28,6 +29,15 @@ const Transactions = () => {
     Category: "",
     Category_id: "",
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStatusMessageAdd(null);
+      setStatusMessageSearch(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [statusMessageAdd, statusMessageSearch]);
 
   useEffect(() => {
     const fetchAllTransactions = async () => {
@@ -69,7 +79,7 @@ const Transactions = () => {
       }
       const data = await response.json();
       setTransactions(data);
-      setStatusMessage({
+      setStatusMessageSearch({
         type: "success",
         text: "Successful Search!",
       });
@@ -85,7 +95,7 @@ const Transactions = () => {
         Category_id: "",
       });
     } catch (err) {
-      setStatusMessage({
+      setStatusMessageSearch({
         type: "error",
         text: err.message,
       });
@@ -106,7 +116,7 @@ const Transactions = () => {
         throw new Error("Failed to add transaction.");
       }
       const data = await response.json();
-      setStatusMessage({
+      setStatusMessageAdd({
         type: "success",
         text: "Transaction added successfully.",
       });
@@ -122,7 +132,7 @@ const Transactions = () => {
         Category_id: "",
       });
     } catch (err) {
-      setStatusMessage({
+      setStatusMessageAdd({
         type: "error",
         text: err.message,
       });
@@ -170,16 +180,13 @@ const Transactions = () => {
   const handleChange2 = (e) => {
     const { name, value } = e.target;
 
-    // Only apply formatting if the name is `Transaction_date` and the value is in MM/DD/YYYY format
     if (
       name === "Transaction_date" &&
       value &&
       /^\d{2}\/\d{2}\/\d{4}$/.test(value)
     ) {
-      // Split the date into month, day, and year
       const [month, day, year] = value.split("/");
 
-      // Format to YYYY-MM-DD for backend compatibility
       const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(
         2,
         "0"
@@ -190,7 +197,6 @@ const Transactions = () => {
         [name]: formattedDate,
       });
     } else {
-      // For other fields or if the date is incomplete, just set the value directly
       setFormData2({
         ...formData2,
         [name]: value,
@@ -326,6 +332,17 @@ const Transactions = () => {
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
             Search Transaction
           </button>
+          {statusMessageSearch && (
+            <div
+              className={
+                statusMessageSearch.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {statusMessageSearch.text}
+            </div>
+          )}
         </form>
 
         <form
@@ -445,18 +462,19 @@ const Transactions = () => {
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
             Add Transaction
           </button>
+          {statusMessageAdd && (
+            <div
+              className={
+                statusMessageAdd.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {statusMessageAdd.text}
+            </div>
+          )}
         </form>
       </div>
-
-      {statusMessage && (
-        <div
-          className={
-            statusMessage.type === "error" ? "text-red-500" : "text-green-500"
-          }
-        >
-          {statusMessage.text} {/* Only render the text here */}
-        </div>
-      )}
 
       <table className="w-full border-collapse bg-white rounded-lg shadow-lg">
         <thead>
