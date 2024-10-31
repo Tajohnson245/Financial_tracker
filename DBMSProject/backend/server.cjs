@@ -79,7 +79,6 @@ app.get("/api/searchTransactions", (req, res) => {
     sql += " AND Transaction_type = ?";
     queryParams.push(Transaction_type.trim());
   }
-
   if (Transaction_date && Transaction_date.trim() !== "") {
     sql += " AND Transaction_date = ?";
     queryParams.push(Transaction_date.trim());

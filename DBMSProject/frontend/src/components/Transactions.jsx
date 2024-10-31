@@ -145,6 +145,15 @@ const Transactions = () => {
     console.log(response);
 
     if (response.ok) {
+      const filteredTransactions = transactions.filter(
+        (transactions) =>
+          !selectedTransactions.includes(transactions.Transaction_id)
+      );
+
+      setTransactions(filteredTransactions);
+
+      setSelectedTransactions([]);
+
       console.log("Transactions deleted successfully");
     } else {
       console.error("Error deleting transactions");
