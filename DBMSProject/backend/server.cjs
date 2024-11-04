@@ -7,23 +7,19 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
-// Middleware to allow cross-origin requests
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "public")));
 
-// use express to process json
 app.use(express.json());
 
-// Create a MySQL connection
 const connection = mysql.createConnection({
-  host: process.env.VITE_HOST, // e.g., localhost
-  user: process.env.VITE_USER, // your MySQL username
-  password: process.env.VITE_PASSWORD, // your MySQL password
-  database: process.env.VITE_DATABASE, // your database name
+  host: process.env.VITE_HOST,
+  user: process.env.VITE_USER,
+  password: process.env.VITE_PASSWORD,
+  database: process.env.VITE_DATABASE,
 });
 
-// Connect to the database
 connection.connect((err) => {
   if (err) {
     console.error("Error connecting to the database:", err);
@@ -32,12 +28,10 @@ connection.connect((err) => {
   console.log("Connected to the database");
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-// API endpoint to get all transactions
 app.get("/api/transactions", (req, res) => {
   connection.query("SELECT * FROM Transactions", (err, results) => {
     if (err) {
@@ -49,7 +43,6 @@ app.get("/api/transactions", (req, res) => {
   });
 });
 
-// transactions query from search form
 app.get("/api/searchTransactions", (req, res) => {
   const {
     Transaction_id,
@@ -103,7 +96,6 @@ app.get("/api/searchTransactions", (req, res) => {
     queryParams.push(`%${Category_id.trim()}%`);
   }
 
-  // Execute the query
   connection.query(sql, queryParams, (err, results) => {
     if (err) {
       console.error("Error fetching transactions:", err);
@@ -114,7 +106,6 @@ app.get("/api/searchTransactions", (req, res) => {
   });
 });
 
-// Endpoint to add a new transaction
 app.post("/api/addTransaction", (req, res) => {
   const {
     Transaction_id,
@@ -156,11 +147,9 @@ app.post("/api/addTransaction", (req, res) => {
   );
 });
 
-// Endpoint to delete a new transaction
 app.delete("/api/deleteTransactions", (req, res) => {
   const { Transaction_id } = req.body;
 
-  // Check if the array exists and has items
   if (!Array.isArray(Transaction_id) || Transaction_id.length === 0) {
     return res.status(400).json({
       success: false,
