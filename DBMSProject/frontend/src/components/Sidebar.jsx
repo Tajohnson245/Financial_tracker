@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import Footer from "./Footer";
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -100,10 +101,7 @@ const Sidebar = () => {
         )}
       </div>
 
-      <div className="text-left text-white mt-auto">
-        <p className="text-lg">© 2024 Financial Tracker</p>
-        <p className="text-lg">All rights reserved.</p>
-      </div>
+      <Footer />
     </div>
   );
 };
