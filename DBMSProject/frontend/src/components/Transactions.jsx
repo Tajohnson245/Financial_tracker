@@ -330,7 +330,7 @@ const Transactions = () => {
             </div>
           </div>
           <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
-            Search Transaction
+            Search Transactions
           </button>
           {statusMessageSearch && (
             <div
