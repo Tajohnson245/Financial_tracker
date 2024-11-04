@@ -10,7 +10,6 @@ const port = 3000;
 // Middleware to allow cross-origin requests
 app.use(cors());
 
-// Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
 // use express to process json
