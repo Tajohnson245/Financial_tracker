@@ -50,14 +50,12 @@ const Sidebar = () => {
           </div>
         </Link>
 
-        {/* Additional Info Toggle Section */}
         {showAdditionalInfo && (
           <div
             className={`${
               isExpanded ? "h-96" : "h-10"
             } bg-teal-300 pt-2 rounded-lg transition-all duration-300 my-4 flex flex-col justify-between`}
           >
-            {/* Toggle button for expanding or collapsing */}
             <button
               onClick={toggleExpand}
               className="w-full text-center text-blue-900 font-semibold"
@@ -65,7 +63,6 @@ const Sidebar = () => {
               Adding Transactions
             </button>
 
-            {/* Expandable content */}
             {isExpanded && (
               <>
                 <ul className="pl-8 pr-2 list-disc text-teal-800 text-sm">
@@ -91,7 +88,6 @@ const Sidebar = () => {
                   </li>
                 </ul>
 
-                {/* Close button */}
                 <button
                   onClick={toggleExpand}
                   className="text-center text-blue-900 font-semibold mb-2"
