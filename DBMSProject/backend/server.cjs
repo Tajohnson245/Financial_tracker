@@ -44,57 +44,31 @@ app.get("/api/transactions", (req, res) => {
 });
 
 app.get("/api/searchTransactions", (req, res) => {
-  const {
-    Transaction_id,
-    Account_id,
-    Transaction_type,
-    Transaction_date,
-    Description,
-    Amount,
-    Balance,
-    Category,
-    Category_id,
-  } = req.query;
+  const { query } = req.query;
 
   let sql = "SELECT * FROM Transactions WHERE 1=1";
   const queryParams = [];
 
-  if (Transaction_id && Transaction_id.trim() !== "") {
-    sql += " AND Transaction_id = ?";
-    queryParams.push(Transaction_id.trim());
+  if (query && query.trim().length >= 3) {
+    const searchValueWildCard = `%${query.trim()}%`;
+    const searchValuePrefix = `${query.trim()}%`;
+
+    sql += ` AND (Transaction_id LIKE ? OR Account_id LIKE ? OR Transaction_type LIKE ? OR Transaction_date LIKE ? OR Description LIKE ? OR Amount LIKE ? OR Balance LIKE ? OR Category LIKE ? OR category_id LIKE ? )`;
+
+    queryParams.push(
+      searchValuePrefix, // Transaction_id
+      searchValuePrefix, // Account_id
+      searchValueWildCard, // Transaction_type
+      searchValuePrefix, // Transaction_date
+      searchValueWildCard, // Description
+      searchValueWildCard, // Amount
+      searchValueWildCard, // Balance
+      searchValueWildCard, // Category
+      searchValuePrefix // category_id
+    );
   }
-  if (Account_id && Account_id.trim() !== "") {
-    sql += " AND Account_id = ?";
-    queryParams.push(Account_id.trim());
-  }
-  if (Transaction_type && Transaction_type.trim() !== "") {
-    sql += " AND Transaction_type = ?";
-    queryParams.push(Transaction_type.trim());
-  }
-  if (Transaction_date && Transaction_date.trim() !== "") {
-    sql += " AND Transaction_date = ?";
-    queryParams.push(Transaction_date.trim());
-  }
-  if (Description && Description.trim() !== "") {
-    sql += " AND Description LIKE ?";
-    queryParams.push(`%${Description.trim()}%`);
-  }
-  if (Amount && Amount.trim() !== "") {
-    sql += " AND Amount = ?";
-    queryParams.push(Amount.trim());
-  }
-  if (Balance && Balance.trim() !== "") {
-    sql += " AND Balance = ?";
-    queryParams.push(Balance.trim());
-  }
-  if (Category && Category.trim() !== "") {
-    sql += " AND Category LIKE ?";
-    queryParams.push(`%${Category.trim()}%`);
-  }
-  if (Category_id && Category_id.trim() !== "") {
-    sql += " AND Category_id LIKE ?";
-    queryParams.push(`%${Category_id.trim()}%`);
-  }
+
+  console.log("SQL Query:", sql);
 
   connection.query(sql, queryParams, (err, results) => {
     if (err) {

@@ -7,15 +7,7 @@ const Transactions = () => {
   const [statusMessageAdd, setStatusMessageAdd] = useState(null);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [formData, setFormData] = useState({
-    Transaction_id: "",
-    Account_id: "",
-    Transaction_type: "",
-    Transaction_date: "",
-    Description: "",
-    Amount: "",
-    Balance: "",
-    Category: "",
-    Category_id: "",
+    query: "",
   });
 
   const [formData2, setFormData2] = useState({
@@ -58,19 +50,16 @@ const Transactions = () => {
 
   const searchTransactionsHandleSubmit = async (e) => {
     e.preventDefault();
+
     const queryParams = new URLSearchParams({
-      Transaction_id: formData.Transaction_id.trim(),
-      Account_id: formData.Account_id.trim(),
-      Transaction_type: formData.Transaction_type.trim(),
-      Transaction_date: formData.Transaction_date.trim(),
-      Description: formData.Description.trim(),
-      Amount: formData.Amount.trim(),
-      Balance: formData.Balance.trim(),
-      Category: formData.Category.trim(),
-      Category_id: formData.Category_id.trim(),
+      query: formData.query.trim(),
     });
 
     try {
+      console.log(
+        `http://localhost:3000/api/searchTransactions?${queryParams.toString()}`
+      );
+
       const response = await fetch(
         `http://localhost:3000/api/searchTransactions?${queryParams.toString()}`
       );
@@ -78,21 +67,14 @@ const Transactions = () => {
         throw new Error("Failed to fetch transactions.");
       }
       const data = await response.json();
+      console.log(data);
       setTransactions(data);
       setStatusMessageSearch({
         type: "success",
         text: "Successful Search!",
       });
       setFormData({
-        Transaction_id: "",
-        Account_id: "",
-        Transaction_type: "",
-        Transaction_date: "",
-        Description: "",
-        Amount: "",
-        Balance: "",
-        Category: "",
-        Category_id: "",
+        query: "",
       });
     } catch (err) {
       setStatusMessageSearch({
@@ -214,142 +196,12 @@ const Transactions = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex space-x-5 mb-5">
+      <div className="flex flex-col space-y-5 mb-5">
         <form
-          className="bg-white p-5 rounded-xl shadow-md w-1/2"
-          onSubmit={searchTransactionsHandleSubmit}
-        >
-          <div className="flex flex-col">
-            <div>
-              <label>
-                Transaction ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Transaction_id"
-                  value={formData.Transaction_id}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Account ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Account_id"
-                  value={formData.Account_id}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Transaction Type:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Transaction_type"
-                  value={formData.Transaction_type}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Transaction Date:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="date"
-                  name="Transaction_date"
-                  value={formData.Transaction_date}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Description:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Description"
-                  value={formData.Description}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Amount:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Amount"
-                  value={formData.Amount}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Balance:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Balance"
-                  value={formData.Balance}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Category:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Category"
-                  value={formData.Category}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Category ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Category_id"
-                  value={formData.Category_id}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-          </div>
-          <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
-            Search Transactions
-          </button>
-          {statusMessageSearch && (
-            <div
-              className={
-                statusMessageSearch.type === "error"
-                  ? "text-red-500"
-                  : "text-green-500"
-              }
-            >
-              {statusMessageSearch.text}
-            </div>
-          )}
-        </form>
-
-        <form
-          className="bg-white p-5 rounded-xl shadow-md w-1/2"
+          className="bg-white p-5 rounded-xl shadow-md w-full"
           onSubmit={addTransactionHandleSubmit}
         >
-          <div className="flex flex-col">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label>
                 Transaction ID:
@@ -471,6 +323,40 @@ const Transactions = () => {
               }
             >
               {statusMessageAdd.text}
+            </div>
+          )}
+        </form>
+
+        <form
+          className="bg-white rounded-xl p-5 w-full shadow-md"
+          onSubmit={searchTransactionsHandleSubmit}
+        >
+          <div className="flex flex-col">
+            <div>
+              <label>
+                Search:
+                <input
+                  className="border rounded p-2 block w-full mt-1"
+                  type="text"
+                  name="query"
+                  value={formData.query}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+          </div>
+          <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
+            Search Transactions
+          </button>
+          {statusMessageSearch && (
+            <div
+              className={
+                statusMessageSearch.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {statusMessageSearch.text}
             </div>
           )}
         </form>
