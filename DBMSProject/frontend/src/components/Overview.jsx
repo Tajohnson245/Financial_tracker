@@ -13,6 +13,7 @@ const Overview = () => {
         }
         const data = await response.json();
         setRecentTransactions(data);
+        console.log(data);
       } catch (err) {
         console.log(err.message);
       }
@@ -42,6 +43,28 @@ const Overview = () => {
       </div>
       <div className="w-[600px] h-[700px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
       Recent transactions
+        <table>
+        <tbody>
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((transaction) => (
+              <tr
+                key={transaction.Transaction_id}
+                className="hover:bg-[#38A3A5]"
+              >
+                <td className="p-2 border text-[20px]">{transaction.date}</td>
+                <td className="p-2 border text-[20px]">{transaction.Description}</td>
+                <td className="p-2 border text-[20px]">{transaction.Amount}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="9" className="text-center p-3">
+                No transactions found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+        </table>
       </div>
       <div className="w-[600px] h-[700px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
       Monthly Spending

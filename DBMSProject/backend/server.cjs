@@ -52,7 +52,7 @@ app.get("/api/transactions", (req, res) => {
 
 // Endpoint for getting 10 most recent transactions
 app.get("/api/recentTransactions", (req, res) => {
-  connection.query("SELECT * FROM Transactions ORDER BY transaction_date DESC LIMIT 10", (err, results) => {
+  connection.query("SELECT Transaction_id, Description, Amount, DATE_FORMAT(Transaction_date, '%m-%d') AS date FROM Transactions ORDER BY Transaction_date DESC LIMIT 10", (err, results) => {
     if (err) {
       console.error("Error fetching transactions:", err);
       res.status(500).send("Error fetching transactions");
