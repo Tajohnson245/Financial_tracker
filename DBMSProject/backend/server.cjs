@@ -50,6 +50,18 @@ app.get("/api/transactions", (req, res) => {
   });
 });
 
+// Endpoint for getting 10 most recent transactions
+app.get("/api/recentTransactions", (req, res) => {
+  connection.query("SELECT * FROM Transactions ORDER BY transaction_date DESC LIMIT 10", (err, results) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      res.status(500).send("Error fetching transactions");
+      return;
+    }
+    res.json(results); // Send results as JSON
+  });
+});
+
 // transactions query from search form
 app.get("/api/searchTransactions", (req, res) => {
   const {
