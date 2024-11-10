@@ -1,7 +1,25 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 
 const Overview = () => {
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchRecentTransactions = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/recentTransactions");
+        if (!response.ok) {
+          throw new Error("Failed to fetch recent transactions.");
+        }
+        const data = await response.json();
+        setRecentTransactions(data);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchRecentTransactions();
+  }, []);
+
   return (
     <div className="flex flex-row space-x-8">
       <div className="flex flex-col space-y-5">
