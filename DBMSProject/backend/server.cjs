@@ -33,14 +33,17 @@ app.listen(port, () => {
 });
 
 app.get("/api/transactions", (req, res) => {
-  connection.query("SELECT * FROM Transactions", (err, results) => {
-    if (err) {
-      console.error("Error fetching transactions:", err);
-      res.status(500).send("Error fetching transactions");
-      return;
+  connection.query(
+    "SELECT * FROM Transactions ORDER BY Transaction_date DESC",
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results);
     }
-    res.json(results); // Send results as JSON
-  });
+  );
 });
 
 app.get("/api/searchTransactions", (req, res) => {
