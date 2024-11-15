@@ -144,10 +144,10 @@ const Transactions = () => {
               </label>
             </div>
             <div className="flex flex-row">
-              <div>
+              <div className="pt-4">
                 <button
                   type="submit"
-                  className="bg-teal-500 text-white p-3 mt-3"
+                  className="bg-teal-500 text-white rounded-full px-4 py-2 flex items-center justify-center text-base font-semibold"
                 >
                   Search Transactions
                 </button>
