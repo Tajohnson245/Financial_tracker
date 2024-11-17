@@ -50,6 +50,31 @@ app.get("/api/transactions", (req, res) => {
   });
 });
 
+// Endpoint for overview monthly spending
+app.get("/api/lastMonthTransactions", (req, res) => {
+  connection.query("SELECT Category, SUM(Amount) AS TotalAmount FROM Transactions WHERE Category != 'Income' AND Transaction_date >= '2024-09-01' AND Transaction_date < '2024-10-01' GROUP BY Category ORDER BY Category", (err, results) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      res.status(500).send("Error fetching transactions");
+      return;
+    }
+    res.json(results); // Send results as JSON
+  });
+});
+
+
+// Endpoint for getting 10 most recent transactions
+app.get("/api/recentTransactions", (req, res) => {
+  connection.query("SELECT Transaction_id, Description, Amount, DATE_FORMAT(Transaction_date, '%m-%d') AS date FROM Transactions ORDER BY Transaction_date DESC LIMIT 10", (err, results) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      res.status(500).send("Error fetching transactions");
+      return;
+    }
+    res.json(results); // Send results as JSON
+  });
+});
+
 // transactions query from search form
 app.get("/api/searchTransactions", (req, res) => {
   const {
