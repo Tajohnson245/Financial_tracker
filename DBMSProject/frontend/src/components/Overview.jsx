@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Overview = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [lastMonthTransactions, setLastMonthtransactions] = useState([]);
+  const [lastMonthTransactions, setLastMonthTransactions] = useState([]);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {
@@ -14,12 +14,29 @@ const Overview = () => {
         }
         const data = await response.json();
         setRecentTransactions(data);
-        console.log(data);
+        //console.log(data);
       } catch (err) {
         console.log(err.message);
       }
     };
     fetchRecentTransactions();
+  }, []);
+
+  useEffect(() => {
+    const fetchLastMonthTransactions = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/lastMonthTransactions");
+        if (!response.ok) {
+          throw new Error("Failed to fetch last month transactions.");
+        }
+        const data = await response.json();
+        setLastMonthTransactions(data);
+        console.log(data);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchLastMonthTransactions();
   }, []);
 
   return (

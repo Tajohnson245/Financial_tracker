@@ -52,7 +52,7 @@ app.get("/api/transactions", (req, res) => {
 
 // Endpoint for overview monthly spending
 app.get("/api/lastMonthTransactions", (req, res) => {
-  connection.query("SELECT Category, SUM(Amount) AS TotalAmount FROM Transactions WHERE TransactionDate >= '2024-09-01' AND TransactionDate < '2024-10-01' GROUP BY Category ORDER BY Category", (err, results) => {
+  connection.query("SELECT Category, SUM(Amount) AS TotalAmount FROM Transactions WHERE Category != 'Income' AND Transaction_date >= '2024-09-01' AND Transaction_date < '2024-10-01' GROUP BY Category ORDER BY Category", (err, results) => {
     if (err) {
       console.error("Error fetching transactions:", err);
       res.status(500).send("Error fetching transactions");
