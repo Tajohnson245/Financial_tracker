@@ -1,9 +1,13 @@
 import React, { useState, useEffect} from "react";
 import { Link } from "react-router-dom";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip);
 
 const Overview = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [lastMonthTransactions, setLastMonthTransactions] = useState([]);
+  const [lastMonthChartData, setLastMonthChartData] = useState(null);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {
@@ -30,8 +34,46 @@ const Overview = () => {
           throw new Error("Failed to fetch last month transactions.");
         }
         const data = await response.json();
-        setLastMonthTransactions(data);
         console.log(data);
+
+        // reformat data for chart
+        const labels = data.map(item => item.Category);
+        const values = data.map(item => Math.abs(parseFloat(item.TotalAmount)));
+
+        setLastMonthChartData({
+          labels,
+          datasets: [
+            {
+              label: 'Spending by Category',
+              data: values,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+                'rgba(199, 199, 199, 0.6)',
+                'rgba(83, 102, 204, 0.6)',
+                'rgba(255, 87, 51, 0.6)',
+                'rgba(120, 200, 80, 0.6)',
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(199, 199, 199, 1)',
+                'rgba(83, 102, 204, 1)',
+                'rgba(255, 87, 51, 1)',
+                'rgba(120, 200, 80, 1)',
+              ],
+              borderWidth: 1,
+            },
+          ],
+        });
       } catch (err) {
         console.log(err.message);
       }
@@ -86,6 +128,22 @@ const Overview = () => {
       </div>
       <div className="w-[600px] h-[700px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
       Monthly Spending
+          <div>
+          {lastMonthChartData ? (
+        <Doughnut
+          data={lastMonthChartData}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              tooltip: { enabled: true },
+            },
+          }}
+        />
+      ) : (
+        <p>Loading chart...</p>
+      )}
+          </div>
       </div>
     </div>
   );
