@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const Overview = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
+  const [lastMonthTransactions, setLastMonthtransactions] = useState([]);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {
