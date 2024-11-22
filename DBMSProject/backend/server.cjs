@@ -148,3 +148,111 @@ app.delete("/api/deleteTransactions", (req, res) => {
     res.json({ success: true, message: "Transactions deleted successfully" });
   });
 });
+
+app.get("/api/goals", (req, res) => {
+  connection.query("SELECT * FROM Goals", (err, results) => {
+    if (err) {
+      console.error("Error fetching goals:", err);
+      res.status(500).send("Error fetching goals");
+      return;
+    }
+    res.json(results); // Send results as JSON
+  });
+});
+
+app.get("/api/searchGoals", (req, res) => {
+  const { query } = req.query;
+
+  let sql = "SELECT * FROM Goals WHERE 1=1";
+  const queryParams = [];
+
+  if (query && query.trim().length >= 3) {
+    const searchValueWildCard = `%${query.trim()}%`;
+    const searchValuePrefix = `${query.trim()}%`;
+
+    sql += ` AND (Goal_id LIKE ? OR Goal_name LIKE ? OR Target_amount LIKE ? OR Current_amount LIKE ? OR Target_date LIKE ? OR Created_at LIKE ? )`;
+
+    queryParams.push(
+      searchValuePrefix, // Goal_id  may cause problems in future look here
+      searchValuePrefix, // Goal_name
+      searchValueWildCard, // Target_amount
+      searchValuePrefix, // Current_date
+      searchValueWildCard, // Target_date
+      searchValueWildCard, // Created_at
+    );
+  }
+
+  console.log("SQL Query:", sql);
+
+  connection.query(sql, queryParams, (err, results) => {
+    if (err) {
+      console.error("Error fetching goals:", err);
+      res.status(500).send("Error fetching goals");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+app.post("/api/addGoal", (req, res) => {
+  const {
+    Goal_id,
+    Goal_name,
+    Target_amount,
+    Current_amount,
+    Target_date,
+    Created_at,
+  } = req.body;
+
+  const sql =
+    "INSERT INTO Goals (Goal_id, Goal_name, Target_amount, Current_amount, Target_date, Created_at) VALUES (?, ?, ?, ?, ?, ?)";
+
+  connection.query(
+    sql,
+    [
+      Goal_id,
+      Goal_name,
+      Target_amount,
+      Current_amount,
+      Target_date,
+      Created_at,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("Error inserting into database:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Database error" });
+      }
+      res.json({ success: true, message: "Goal added successfully" });
+    }
+  );
+});
+
+app.delete("/api/deleteGoals", (req, res) => {
+  const { Goal_id } = req.body;
+
+  if (!Array.isArray(Goal_id) || Goal_id.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "No goals selected for deletion.",
+    });
+  }
+
+  const sql = "DELETE FROM Goals WHERE Goal_id IN (?)";
+
+  connection.query(sql, [Goal_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting goals from database:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Goals not found" });
+    }
+    res.json({ success: true, message: "Goals deleted successfully" });
+  });
+});
