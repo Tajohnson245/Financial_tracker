@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Transactions from "./components/Transactions";
+import Goals from "./components/Goals";
 import Overview from "./components/Overview";
+
 import "./index.css";
 
 function App() {
@@ -29,7 +31,14 @@ function App() {
                 </>
               }
             />
-            <Route path="/goals" element={<div>Goals Page</div>} />
+            <Route
+              path="/goals"
+              element={
+                <>
+                  <Goals />
+                </>
+              }
+            />
             <Route path="/trends" element={<div>Trends Page</div>} />
             <Route path="/test" element={<div>Test Page</div>} />
             <Route
