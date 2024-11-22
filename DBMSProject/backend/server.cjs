@@ -181,7 +181,7 @@ app.get("/api/searchGoals", (req, res) => {
       searchValueWildCard, // Target_amount
       searchValuePrefix, // Current_date
       searchValueWildCard, // Target_date
-      searchValueWildCard, // Created_at
+      searchValueWildCard // Created_at
     );
   }
 
