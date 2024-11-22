@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from "react";
+import AddTransaction from "./AddTransactions";
 
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [statusMessageSearch, setStatusMessageSearch] = useState(null);
-  const [statusMessageAdd, setStatusMessageAdd] = useState(null);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
-  const [formData, setFormData] = useState({
-    query: "",
-  });
-
-  const [formData2, setFormData2] = useState({
-    Transaction_id: "",
-    Account_id: "",
-    Transaction_type: "",
-    Transaction_date: "",
-    Description: "",
-    Amount: "",
-    Balance: "",
-    Category: "",
-    Category_id: "",
-  });
+  const [formData, setFormData] = useState({ query: "" });
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setStatusMessageAdd(null);
       setStatusMessageSearch(null);
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [statusMessageAdd, statusMessageSearch]);
+  }, [statusMessageSearch]);
 
   useEffect(() => {
     const fetchAllTransactions = async () => {
@@ -51,15 +37,21 @@ const Transactions = () => {
   const searchTransactionsHandleSubmit = async (e) => {
     e.preventDefault();
 
+    const query = formData.query.trim();
+
+    if (!query) {
+      setStatusMessageSearch({
+        type: "error",
+        text: "Please enter a search term.",
+      });
+      return;
+    }
+
     const queryParams = new URLSearchParams({
       query: formData.query.trim(),
     });
 
     try {
-      console.log(
-        `http://localhost:3000/api/searchTransactions?${queryParams.toString()}`
-      );
-
       const response = await fetch(
         `http://localhost:3000/api/searchTransactions?${queryParams.toString()}`
       );
@@ -67,7 +59,6 @@ const Transactions = () => {
         throw new Error("Failed to fetch transactions.");
       }
       const data = await response.json();
-      console.log(data);
       setTransactions(data);
       setStatusMessageSearch({
         type: "success",
@@ -78,43 +69,6 @@ const Transactions = () => {
       });
     } catch (err) {
       setStatusMessageSearch({
-        type: "error",
-        text: err.message,
-      });
-    }
-  };
-
-  const addTransactionHandleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3000/api/addTransaction", {
-        method: "POST", // Specify POST method
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData2), // Send form data as JSON in the request body
-      });
-      if (!response.ok) {
-        throw new Error("Failed to add transaction.");
-      }
-      const data = await response.json();
-      setStatusMessageAdd({
-        type: "success",
-        text: "Transaction added successfully.",
-      });
-      setFormData2({
-        Transaction_id: "",
-        Account_id: "",
-        Transaction_type: "",
-        Transaction_date: "",
-        Description: "",
-        Amount: "",
-        Balance: "",
-        Category: "",
-        Category_id: "",
-      });
-    } catch (err) {
-      setStatusMessageAdd({
         type: "error",
         text: err.message,
       });
@@ -159,33 +113,6 @@ const Transactions = () => {
     });
   };
 
-  const handleChange2 = (e) => {
-    const { name, value } = e.target;
-
-    if (
-      name === "Transaction_date" &&
-      value &&
-      /^\d{2}\/\d{2}\/\d{4}$/.test(value)
-    ) {
-      const [month, day, year] = value.split("/");
-
-      const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(
-        2,
-        "0"
-      )}`;
-
-      setFormData2({
-        ...formData2,
-        [name]: formattedDate,
-      });
-    } else {
-      setFormData2({
-        ...formData2,
-        [name]: value,
-      });
-    }
-  };
-
   const handleSelect = (Transaction_id) => {
     setSelectedTransactions((prevSelected) =>
       prevSelected.includes(Transaction_id)
@@ -194,144 +121,16 @@ const Transactions = () => {
     );
   };
 
-  return (
-    <div className="flex flex-col">
-      <div className="flex flex-col space-y-5 mb-5">
-        <form
-          className="bg-white p-5 rounded-xl shadow-md w-full"
-          onSubmit={addTransactionHandleSubmit}
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label>
-                Transaction ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Transaction_id"
-                  value={formData2.Transaction_id}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Account ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Account_id"
-                  value={formData2.Account_id}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Transaction Type:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Transaction_type"
-                  value={formData2.Transaction_type}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Transaction Date:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="date"
-                  name="Transaction_date"
-                  value={formData2.Transaction_date}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Description:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Description"
-                  value={formData2.Description}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Amount:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Amount"
-                  value={formData2.Amount}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Balance:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Balance"
-                  value={formData2.Balance}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Category:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Category"
-                  value={formData2.Category}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Category ID:
-                <input
-                  className="border rounded p-2 block w-full mt-1"
-                  type="text"
-                  name="Category_id"
-                  value={formData2.Category_id}
-                  onChange={handleChange2}
-                />
-              </label>
-            </div>
-          </div>
-          <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
-            Add Transaction
-          </button>
-          {statusMessageAdd && (
-            <div
-              className={
-                statusMessageAdd.type === "error"
-                  ? "text-red-500"
-                  : "text-green-500"
-              }
-            >
-              {statusMessageAdd.text}
-            </div>
-          )}
-        </form>
+  const toggleAddTransaction = () => setIsOpen((prev) => !prev);
 
-        <form
-          className="bg-white rounded-xl p-5 w-full shadow-md"
-          onSubmit={searchTransactionsHandleSubmit}
-        >
-          <div className="flex flex-col">
+  return (
+    <>
+      <div className="flex flex-col">
+        <div className="flex items-center space-x-3 mb-5">
+          <form
+            className="bg-white rounded-xl p-5 w-full shadow-md"
+            onSubmit={searchTransactionsHandleSubmit}
+          >
             <div>
               <label>
                 Search:
@@ -344,80 +143,117 @@ const Transactions = () => {
                 />
               </label>
             </div>
-          </div>
-          <button type="submit" className="bg-teal-500 text-white p-3 mt-3">
-            Search Transactions
-          </button>
-          {statusMessageSearch && (
-            <div
-              className={
-                statusMessageSearch.type === "error"
-                  ? "text-red-500"
-                  : "text-green-500"
-              }
-            >
-              {statusMessageSearch.text}
+            <div className="flex flex-row">
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  className="bg-teal-500 text-white rounded-full px-4 py-2 flex items-center justify-center text-base font-semibold"
+                >
+                  Search Transactions
+                </button>
+              </div>
+              <div className="pl-4 pt-4">
+                <button
+                  type="button"
+                  className="bg-teal-500 text-white rounded-full px-4 py-2 flex items-center justify-center text-base font-semibold"
+                  onClick={toggleAddTransaction}
+                >
+                  Add Transactions
+                </button>
+              </div>
             </div>
-          )}
-        </form>
-      </div>
 
-      <table className="w-full border-collapse bg-white rounded-lg shadow-lg">
-        <thead>
-          <tr className="bg-[#22577A] text-white">
-            <th className="p-2">Transaction Id</th>
-            <th className="p-2">Account Id</th>
-            <th className="p-2">Transaction Type</th>
-            <th className="p-2">Transaction Date</th>
-            <th className="p-2">Description</th>
-            <th className="p-2">Amount</th>
-            <th className="p-2">Balance</th>
-            <th className="p-2">Category</th>
-            <th className="p-2">Category Id</th>
-            <th className="p-2">
+            {statusMessageSearch && (
+              <div
+                className={
+                  statusMessageSearch.type === "error"
+                    ? "text-red-500"
+                    : "text-green-500"
+                }
+              >
+                {statusMessageSearch.text}
+              </div>
+            )}
+          </form>
+        </div>
+
+        {isOpen && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            onClick={toggleAddTransaction} // Close modal when clicking outside
+          >
+            <div
+              className="bg-white p-5 rounded-xl shadow-lg w-11/12 md:w-1/2 relative"
+              onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
+            >
               <button
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded"
-                onClick={deleteTransaction}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                onClick={toggleAddTransaction}
               >
-                Delete
+                &times;
               </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.length > 0 ? (
-            transactions.map((transaction) => (
-              <tr
-                key={transaction.Transaction_id}
-                className="hover:bg-[#38A3A5]"
-              >
-                <td className="p-2 border">{transaction.Transaction_id}</td>
-                <td className="p-2 border">{transaction.Account_id}</td>
-                <td className="p-2 border">{transaction.Transaction_type}</td>
-                <td className="p-2 border">{transaction.Transaction_date}</td>
-                <td className="p-2 border">{transaction.Description}</td>
-                <td className="p-2 border">{transaction.Amount}</td>
-                <td className="p-2 border">{transaction.Balance}</td>
-                <td className="p-2 border">{transaction.Category}</td>
-                <td className="p-2 border">{transaction.Category_id}</td>
-                <td className="p-2 pl-8 border">
-                  <input
-                    type="checkbox"
-                    onChange={() => handleSelect(transaction.Transaction_id)}
-                  />
+              <AddTransaction />
+            </div>
+          </div>
+        )}
+
+        <table className="w-full border-collapse bg-white rounded-lg shadow-lg">
+          <thead>
+            <tr className="bg-[#22577A] text-white">
+              <th className="p-2">Transaction Id</th>
+              <th className="p-2">Account Id</th>
+              <th className="p-2">Transaction Type</th>
+              <th className="p-2">Transaction Date</th>
+              <th className="p-2">Description</th>
+              <th className="p-2">Amount</th>
+              <th className="p-2">Balance</th>
+              <th className="p-2">Category</th>
+              <th className="p-2">Category Id</th>
+              <th className="p-2">
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded"
+                  onClick={deleteTransaction}
+                >
+                  Delete
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.length > 0 ? (
+              transactions.map((transaction) => (
+                <tr
+                  key={transaction.Transaction_id}
+                  className="hover:bg-[#38A3A5]"
+                >
+                  <td className="p-2 border">{transaction.Transaction_id}</td>
+                  <td className="p-2 border">{transaction.Account_id}</td>
+                  <td className="p-2 border">{transaction.Transaction_type}</td>
+                  <td className="p-2 border">{transaction.Transaction_date}</td>
+                  <td className="p-2 border">{transaction.Description}</td>
+                  <td className="p-2 border">{transaction.Amount}</td>
+                  <td className="p-2 border">{transaction.Balance}</td>
+                  <td className="p-2 border">{transaction.Category}</td>
+                  <td className="p-2 border">{transaction.Category_id}</td>
+                  <td className="p-2 pl-8 border">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleSelect(transaction.Transaction_id)}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="10" className="text-center p-3">
+                  No transactions found.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="9" className="text-center p-3">
-                No transactions found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 
