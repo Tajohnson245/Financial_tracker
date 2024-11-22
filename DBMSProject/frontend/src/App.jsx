@@ -3,6 +3,8 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Transactions from "./components/Transactions";
 import Goals from "./components/Goals";
+import Overview from "./components/Overview";
+
 import "./index.css";
 
 function App() {
@@ -13,7 +15,14 @@ function App() {
         <Sidebar />
         <div className="flex-1 p-5 pt-20 ml-72 bg-green-200">
           <Routes>
-            <Route path="/overview" element={<div>Overview Page</div>} />
+            <Route
+              path="/overview"
+              element={
+                <>
+                  <Overview />
+                </>
+              }
+            />
             <Route
               path="/transactions"
               element={
