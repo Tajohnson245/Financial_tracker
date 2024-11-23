@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Transactions from "./components/Transactions";
 import Goals from "./components/Goals";
 import Overview from "./components/Overview";
+import Trends from "./components/Trends";
 
 import "./index.css";
 
@@ -39,7 +40,14 @@ function App() {
                 </>
               }
             />
-            <Route path="/trends" element={<div>Trends Page</div>} />
+            <Route
+              path="/trends"
+              element={
+                <>
+                  <Trends />
+                </>
+              }
+            />
             <Route path="/test" element={<div>Test Page</div>} />
             <Route
               path="/"
