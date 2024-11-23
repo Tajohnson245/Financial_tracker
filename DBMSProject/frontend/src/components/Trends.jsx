@@ -4,6 +4,7 @@ const Trends = () => {
 
     const [startDate, setStartDate] = useState(new Date(2024, 0));
     const [endDate, setEndDate] = useState(new Date(2024, 9));
+    const [allTransactions, setAllTransactions] = useState([]);
 
     const formatDate = (date) => {
         return date.toLocaleDateString("en-US", {
@@ -12,7 +13,7 @@ const Trends = () => {
         });
     };
 
-  // Adjust date range by moving months forward or backward
+    // Adjust date range by moving months forward or backward
     const adjustDateRange = (direction, end) => {
         if (end == "beginning"){
             const newStartDate = new Date(
@@ -29,6 +30,23 @@ const Trends = () => {
             setEndDate(newEndDate);
         }
     };
+
+    useEffect(() => {
+        const fetchAllTransactions = async () => {
+          try {
+            const response = await fetch("http://localhost:3000/api/allTransactionsByMonth");
+            if (!response.ok) {
+              throw new Error("Failed to fetch transactions.");
+            }
+            const data = await response.json();
+            setAllTransactions(data);
+          } catch (err) {
+            console.log(err);
+          }
+        };
+        fetchAllTransactions();
+        console.log(allTransactions);
+      }, []);
 
     return (
         <div className="h-[100%] font-bold text-[30px]">
@@ -65,7 +83,9 @@ const Trends = () => {
                 &gt;
             </button>
         </div>
-            <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10"></div>
+            <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
+
+            </div>
         </div>
     );
 };

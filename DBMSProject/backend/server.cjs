@@ -58,6 +58,25 @@ app.get("/api/lastMonthTransactions", (req, res) => {
   });
 });
 
+// Endpoint for getting all transactions ordered by month
+app.get("/api/allTransactionsByMonth", (req, res) => {
+  connection.query(
+    `SELECT 
+       Transaction_id, 
+       Balance,
+       DATE_FORMAT(Transaction_date, '%Y-%m-%d') AS date 
+     FROM Transactions 
+     ORDER BY MONTH(Transaction_date), DAY(Transaction_date)`,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results); // Send results as JSON
+    }
+  );
+});
 
 // Endpoint for getting 10 most recent transactions
 app.get("/api/recentTransactions", (req, res) => {
