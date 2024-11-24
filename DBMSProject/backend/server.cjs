@@ -66,7 +66,7 @@ app.get("/api/allTransactionsByMonth", (req, res) => {
        Balance,
        DATE_FORMAT(Transaction_date, '%Y-%m-%d') AS date 
      FROM Transactions 
-     ORDER BY MONTH(Transaction_date), DAY(Transaction_date)`,
+     ORDER BY date ASC`,
     (err, results) => {
       if (err) {
         console.error("Error fetching transactions:", err);
