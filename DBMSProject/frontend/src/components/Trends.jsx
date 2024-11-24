@@ -25,7 +25,7 @@ const Trends = () => {
                     unit: 'month',
                 },
                 min: '2024-01-01',
-                max: null
+                max: '2024-10-01'
             },
             y: {
                 title: {
@@ -61,7 +61,7 @@ const Trends = () => {
                 startDate.getMonth() + direction
             );
             setStartDate(newStartDate);
-            // set new chart date
+            // set new chart start date
             setChartOptions((prevOptions) => ({
                 ...prevOptions,
                 scales: {
@@ -79,6 +79,18 @@ const Trends = () => {
                 endDate.getMonth() + direction
             );
             setEndDate(newEndDate);
+            // set new chart end date
+            setChartOptions((prevOptions) => ({
+                ...prevOptions,
+                scales: {
+                    ...prevOptions.scales,
+                    x: {
+                        ...prevOptions.scales.x,
+                        max: `${newEndDate.getFullYear()}-${String(newEndDate.getMonth() + 1).padStart(2, '0')}-01`,
+                    },
+                },
+            }));
+
         }
     }; 
 
