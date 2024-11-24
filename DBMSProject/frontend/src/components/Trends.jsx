@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale } from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale } from "chart.js";
 import 'chartjs-adapter-date-fns';
 
 // Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale);
 
 const Trends = () => {
 
@@ -18,7 +18,7 @@ const Trends = () => {
             x: {
                 title: {
                     display: true,
-                    text: "Date",
+                    text: "Month",
                 },
                 type: 'time',
                 time: {
@@ -44,7 +44,24 @@ const Trends = () => {
             },
           },
         }
-    })
+    });
+    const [barChartOptions, setBarChartOptions] = useState({
+        responsive: true,
+        plugins: {
+        legend: {
+            position: 'top', // Position of the legend
+        },
+        title: {
+            display: true,
+            text: 'Income vs Spending', // Chart title
+        },
+        },
+        scales: {
+        y: {
+            beginAtZero: true, // Ensures the y-axis starts at zero
+        },
+        }
+    });
 
     const formatDate = (date) => {
         return date.toLocaleDateString("en-US", {
@@ -94,8 +111,6 @@ const Trends = () => {
         }
     }; 
 
-
-
     useEffect(() => {
         const fetchAllTransactions = async () => {
           try {
@@ -128,44 +143,47 @@ const Trends = () => {
         ],
     };
 
-
     return (
         <div className="h-[100%] font-bold text-[30px]">
-            <div className="w-full h-[100px] bg-white font-bold text-[30px] px-6 rounded-lg mb-2 flex items-center justify-center gap-4">
-            <button
-                onClick={() => adjustDateRange(-1, "beginning")}
-                className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
-            >
-                &lt;
-            </button>
-            <span>
-                {" " + formatDate(startDate) + " "}
-            </span>
-            <button
-                onClick={() => adjustDateRange(1, "beginning")}
-                className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
-            >
-                &gt;
-            </button>
-            <span> - </span>
-            <button
-                onClick={() => adjustDateRange(-1, "end")}
-                className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
-            >
-                &lt;
-            </button>
-            <span>
-                {" " + formatDate(endDate) + " "}
-            </span>
-            <button
-                onClick={() => adjustDateRange(1, "end")}
-                className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
-            >
-                &gt;
-            </button>
-        </div>
+            <div className="w-[100%] h-[100px] bg-white font-bold text-[30px] px-6 rounded-lg mb-2 flex items-center justify-center gap-4">
+                <button
+                    onClick={() => adjustDateRange(-1, "beginning")}
+                    className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+                >
+                    &lt;
+                </button>
+                <span>
+                    {" " + formatDate(startDate) + " "}
+                </span>
+                <button
+                    onClick={() => adjustDateRange(1, "beginning")}
+                    className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+                >
+                    &gt;
+                </button>
+                <span> - Balance - </span>
+                <button
+                    onClick={() => adjustDateRange(-1, "end")}
+                    className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+                >
+                    &lt;
+                </button>
+                <span>
+                    {" " + formatDate(endDate) + " "}
+                </span>
+                <button
+                    onClick={() => adjustDateRange(1, "end")}
+                    className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+                >
+                    &gt;
+                </button>
+            </div>
             <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
                 <Line data={chartData} options={chartOptions} />
+            </div>
+            <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
+                spending vs income
+                <Bar data={chartData} options={barChartOptions} />
             </div>
         </div>
     );
