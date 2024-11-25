@@ -78,6 +78,31 @@ app.get("/api/allTransactionsByMonth", (req, res) => {
   );
 });
 
+// Endpoint for getting income vs spending ordered by month
+app.get("/api/spendingVSIncome", (req, res) => {
+  connection.query(
+        `SELECT 
+        MONTH(Transaction_date) AS Month,
+        YEAR(Transaction_date) AS Year,
+        SUM(CASE WHEN Amount < 0 THEN Amount ELSE 0 END) AS Spending,
+        SUM(CASE WHEN Amount > 0 THEN Amount ELSE 0 END) AS Income
+    FROM 
+        Transactions
+    GROUP BY 
+        YEAR(Transaction_date), MONTH(Transaction_date)
+    ORDER BY 
+        Year, Month;`,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results); // Send results as JSON
+    }
+  );
+});
+
 // Endpoint for getting 10 most recent transactions
 app.get("/api/recentTransactions", (req, res) => {
   connection.query("SELECT Transaction_id, Description, Amount, DATE_FORMAT(Transaction_date, '%m-%d') AS date FROM Transactions ORDER BY Transaction_date DESC LIMIT 10", (err, results) => {

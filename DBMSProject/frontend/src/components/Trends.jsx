@@ -11,6 +11,7 @@ const Trends = () => {
     const [startDate, setStartDate] = useState(new Date(2024, 0));
     const [endDate, setEndDate] = useState(new Date(2024, 9));
     const [allTransactions, setAllTransactions] = useState([]);
+    const [spendingVSIncome, setSpendingVSIncome] = useState([]);
     const [chartOptions, setChartOptions] = useState({
         responsive: true,
         maintainAspectRatio: false,
@@ -57,9 +58,21 @@ const Trends = () => {
         },
         },
         scales: {
-        y: {
-            beginAtZero: true, // Ensures the y-axis starts at zero
-        },
+            x: {
+                title: {
+                    display: true,
+                    text: "Month",
+                },
+                type: 'time',
+                time: {
+                    unit: 'month',
+                },
+                min: '2024-01-01',
+                max: '2024-10-01'
+                },
+            y: {
+                beginAtZero: true, // Ensures the y-axis starts at zero
+            },
         }
     });
 
@@ -110,6 +123,23 @@ const Trends = () => {
 
         }
     }; 
+    
+    useEffect(() => {
+        const fetchSpendingVSIncome = async () => {
+          try {
+            const response = await fetch("http://localhost:3000/api/spendingVSIncome");
+            if (!response.ok) {
+              throw new Error("Failed to fetch transactions.");
+            }
+            const data = await response.json();
+            setSpendingVSIncome(data);
+            console.log(data);
+          } catch (err) {
+            console.log(err);
+          }
+        };
+        fetchSpendingVSIncome();
+      }, []);
 
     useEffect(() => {
         const fetchAllTransactions = async () => {
@@ -125,7 +155,6 @@ const Trends = () => {
           }
         };
         fetchAllTransactions();
-        console.log(allTransactions);
       }, []);
 
     // Prepare data for the chart
@@ -142,6 +171,28 @@ const Trends = () => {
         },
         ],
     };
+
+    const barChartData = {
+        labels: spendingVSIncome.map((entry) => `${entry.Year}-${String(entry.Month).padStart(2, "0")}`), // Format Month and Year into "YYYY-MM"
+        datasets: [
+          {
+            label: "Income",
+            data: spendingVSIncome.map((entry) => parseFloat(entry.Income)), // Convert Income to numbers
+            borderColor: "rgba(54, 162, 235, 1)", // Line color
+            backgroundColor: "rgba(75, 192, 75, 1)", // Fill color
+            pointBackgroundColor: "rgba(54, 162, 235, 1)", // Point color
+            fill: false,
+          },
+          {
+            label: "Spending",
+            data: spendingVSIncome.map((entry) => parseFloat(-1 * entry.Spending)), // Convert Spending to numbers
+            borderColor: "rgba(255, 99, 132, 1)", // Line color
+            backgroundColor: "rgba(192, 75, 75, 1)", // Fill color
+            pointBackgroundColor: "rgba(255, 99, 132, 1)", // Point color
+            fill: false,
+          },
+        ],
+      };
 
     return (
         <div className="h-[100%] font-bold text-[30px]">
@@ -181,9 +232,8 @@ const Trends = () => {
             <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
                 <Line data={chartData} options={chartOptions} />
             </div>
-            <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
-                spending vs income
-                <Bar data={chartData} options={barChartOptions} />
+            <div className="w-[100%] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
+                <Bar data={barChartData} options={barChartOptions} />
             </div>
         </div>
     );
