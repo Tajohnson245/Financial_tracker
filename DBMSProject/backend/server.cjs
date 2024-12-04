@@ -121,6 +121,30 @@ app.get("/api/spendingVSIncome", (req, res) => {
   );
 });
 
+// Endpoint for getting income vs spending ordered by month
+app.get("/api/transactionsVSLastYear", (req, res) => {
+  connection.query(
+    `SELECT 
+    Category, 
+    SUM(CASE WHEN YEAR(Transaction_date) = YEAR(CURRENT_DATE) AND MONTH(Transaction_date) BETWEEN 1 AND 10 THEN Amount ELSE 0 END) AS CurrentYearJanToOctTotal,
+    SUM(CASE WHEN YEAR(Transaction_date) = YEAR(CURRENT_DATE) - 1 AND MONTH(Transaction_date) BETWEEN 1 AND 10 THEN Amount ELSE 0 END) AS LastYearJanToOctTotal,
+    SUM(CASE WHEN YEAR(Transaction_date) = YEAR(CURRENT_DATE) AND MONTH(Transaction_date) BETWEEN 1 AND 10 THEN Amount ELSE 0 END) 
+    - SUM(CASE WHEN YEAR(Transaction_date) = YEAR(CURRENT_DATE) - 1 AND MONTH(Transaction_date) BETWEEN 1 AND 10 THEN Amount ELSE 0 END) AS Difference
+FROM Transactions t
+WHERE (YEAR(Transaction_date) = YEAR(CURRENT_DATE) AND MONTH(Transaction_date) BETWEEN 1 AND 10) 
+   OR (YEAR(Transaction_date) = YEAR(CURRENT_DATE) - 1 AND MONTH(Transaction_date) BETWEEN 1 AND 10)
+GROUP BY Category;`,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results); // Send results as JSON
+    }
+  );
+});
+
 // Endpoint for getting 10 most recent transactions
 app.get("/api/recentTransactions", (req, res) => {
   connection.query(
