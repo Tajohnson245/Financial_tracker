@@ -48,14 +48,17 @@ app.get("/api/transactions", (req, res) => {
 
 // Endpoint for overview monthly spending
 app.get("/api/lastMonthTransactions", (req, res) => {
-  connection.query("SELECT Category, SUM(Amount) AS TotalAmount FROM Transactions WHERE Category != 'Income' AND Transaction_date >= '2024-09-01' AND Transaction_date < '2024-10-01' GROUP BY Category ORDER BY Category", (err, results) => {
-    if (err) {
-      console.error("Error fetching transactions:", err);
-      res.status(500).send("Error fetching transactions");
-      return;
+  connection.query(
+    "SELECT Category, SUM(Amount) AS TotalAmount FROM Transactions WHERE Category != 'Income' AND Transaction_date >= '2024-09-01' AND Transaction_date < '2024-10-01' GROUP BY Category ORDER BY Category",
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results); // Send results as JSON
     }
-    res.json(results); // Send results as JSON
-  });
+  );
 });
 
 // Endpoint for getting all transactions ordered by month
@@ -81,7 +84,7 @@ app.get("/api/allTransactionsByMonth", (req, res) => {
 // Endpoint for getting income vs spending ordered by month
 app.get("/api/spendingVSIncome", (req, res) => {
   connection.query(
-        `SELECT 
+    `SELECT 
         MONTH(Transaction_date) AS Month,
         YEAR(Transaction_date) AS Year,
         SUM(CASE WHEN Amount < 0 THEN Amount ELSE 0 END) AS Spending,
@@ -105,14 +108,17 @@ app.get("/api/spendingVSIncome", (req, res) => {
 
 // Endpoint for getting 10 most recent transactions
 app.get("/api/recentTransactions", (req, res) => {
-  connection.query("SELECT Transaction_id, Description, Amount, DATE_FORMAT(Transaction_date, '%m-%d') AS date FROM Transactions ORDER BY Transaction_date DESC LIMIT 10", (err, results) => {
-    if (err) {
-      console.error("Error fetching transactions:", err);
-      res.status(500).send("Error fetching transactions");
-      return;
+  connection.query(
+    "SELECT Transaction_id, Description, Amount, DATE_FORMAT(Transaction_date, '%m-%d') AS date FROM Transactions ORDER BY Transaction_date DESC LIMIT 10",
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching transactions:", err);
+        res.status(500).send("Error fetching transactions");
+        return;
+      }
+      res.json(results); // Send results as JSON
     }
-    res.json(results); // Send results as JSON
-  });
+  );
 });
 
 // transactions query from search form
@@ -153,7 +159,7 @@ app.get("/api/searchTransactions", (req, res) => {
   });
 });
 
-app.post("/api/addTransaction", (req, res) => {
+app.put("/api/addTransaction", (req, res) => {
   const {
     Transaction_id,
     Account_id,
@@ -192,6 +198,128 @@ app.post("/api/addTransaction", (req, res) => {
       res.json({ success: true, message: "Transaction added successfully" });
     }
   );
+});
+
+app.put("/api/updateTransaction", (req, res) => {
+  const {
+    Transaction_id,
+    Account_id,
+    Transaction_type,
+    Transaction_date,
+    Description,
+    Amount,
+    Balance,
+    Category,
+    Category_id,
+  } = req.body;
+
+  // Validate required fields
+  if (
+    !Transaction_id ||
+    typeof Transaction_id !== "string" ||
+    Transaction_id.trim() === ""
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid Transaction ID" });
+  }
+
+  if (!Transaction_date || !/^\d{4}-\d{2}-\d{2}$/.test(Transaction_date)) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Invalid date format (YYYY-MM-DD required)",
+      });
+  }
+
+  if (
+    !Description ||
+    typeof Description !== "string" ||
+    Description.trim() === ""
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Description is required" });
+  }
+
+  // Validate decimal fields
+  const amount = parseFloat(Amount);
+  const balance = parseFloat(Balance);
+
+  if (isNaN(amount)) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Amount must be a valid decimal number",
+      });
+  }
+
+  if (isNaN(balance)) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Balance must be a valid decimal number",
+      });
+  }
+
+  // Check if the Transaction_id exists
+  const checkSql = "SELECT 1 FROM Transactions WHERE Transaction_id = ?";
+  connection.query(checkSql, [Transaction_id], (err, results) => {
+    if (err) {
+      console.error("Error checking transaction existence:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Transaction not found" });
+    }
+
+    // Proceed with the update
+    const updateSql = `
+      UPDATE Transactions
+      SET Account_id = ?, Transaction_type = ?, Transaction_date = ?, Description = ?, Amount = ?, Balance = ?, Category = ?, Category_id = ?
+      WHERE Transaction_id = ?;
+    `;
+    const queryParams = [
+      Account_id,
+      Transaction_type,
+      Transaction_date,
+      Description,
+      amount, // Use parsed float value
+      balance, // Use parsed float value
+      Category,
+      Category_id,
+      Transaction_id,
+    ];
+
+    connection.query(updateSql, queryParams, (err, result) => {
+      if (err) {
+        console.error("Error updating transaction:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Database error" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Transaction not updated. No changes detected.",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: `Transaction with ID ${Transaction_id} updated successfully.`,
+      });
+    });
+  });
 });
 
 app.delete("/api/deleteTransactions", (req, res) => {
