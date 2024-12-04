@@ -7,6 +7,8 @@ ChartJS.register(ArcElement, Tooltip);
 const Overview = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [lastMonthChartData, setLastMonthChartData] = useState(null);
+  const [checkingBalance, setCheckingBalance] = useState(null);
+  const [savingsBalance, setSavingsBalance] = useState(null);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {
@@ -26,6 +28,25 @@ const Overview = () => {
   }, []);
 
   useEffect(() => {
+    const fetchAccountBalance = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/accountBalance");
+        if (!response.ok) {
+          throw new Error("Failed to fetch recent transactions.");
+        }
+        const data = await response.json();
+        console.log(data);
+        setCheckingBalance(data[0].balance);
+        setSavingsBalance(data[1].balance);
+        //console.log(data);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchAccountBalance();
+  }, []);
+
+  useEffect(() => {
     const fetchLastMonthTransactions = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/lastMonthTransactions");
@@ -33,7 +54,7 @@ const Overview = () => {
           throw new Error("Failed to fetch last month transactions.");
         }
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
 
         // reformat data for chart
         const labels = data.map(item => item.Category);
@@ -81,19 +102,15 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="flex flex-row space-x-8">
-      <div className="flex flex-col space-y-5">
+    <div className="flex h-[100%] flex-row space-x-8">
+      <div className="flex h-[1000px] flex-col space-y-5">
         <div className="w-[550px] h-[150px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
-          Checking Account (..1234)
-          $12,345.67
+          Checking Account: <br />
+          ${checkingBalance}
         </div>
         <div className="w-[550px] h-[150px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
-          Savings Account (..4567)
-          $678.90
-        </div>
-        <div className="w-[550px] h-[150px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
-          Goal # <br></br>
-          $12,345.67 / $20,000
+          Savings Account: <br />
+          ${savingsBalance}
         </div>
         <div className="w-[550px] h-[150px] bg-[#ffffff] font-bold text-[30px] py-3 px-6 rounded-lg mb-2">
           Spending this time last month

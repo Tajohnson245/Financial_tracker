@@ -81,6 +81,21 @@ app.get("/api/allTransactionsByMonth", (req, res) => {
   );
 });
 
+// Endpoint for getting all transactions ordered by month
+app.get("/api/accountBalance", (req, res) => {
+  connection.query(
+    `SELECT * from Accounts`,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching account balances:", err);
+        res.status(500).send("Error fetching account Balances");
+        return;
+      }
+      res.json(results); // Send results as JSON
+    }
+  );
+});
+
 // Endpoint for getting income vs spending ordered by month
 app.get("/api/spendingVSIncome", (req, res) => {
   connection.query(
