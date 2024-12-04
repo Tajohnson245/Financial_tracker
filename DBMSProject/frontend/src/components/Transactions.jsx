@@ -82,6 +82,46 @@ const Transactions = () => {
     setIsOpen((prev) => !prev);
   };
 
+  const deleteTransaction = async () => {
+    const response = await fetch(
+      "http://localhost:3000/api/deleteTransactions",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Transaction_id: selectedTransactions }),
+      }
+    );
+    console.log(JSON.stringify({ Transaction_id: selectedTransactions }));
+    console.log(response);
+    if (response.ok) {
+      const filteredTransactions = transactions.filter(
+        (transactions) =>
+          !selectedTransactions.includes(transactions.Transaction_id)
+      );
+      setTransactions(filteredTransactions);
+      setSelectedTransactions([]);
+      console.log("Transactions deleted successfully");
+    } else {
+      console.error("Error deleting transactions");
+    }
+  };
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSelect = (Transaction_id) => {
+    setSelectedTransactions((prevSelected) =>
+      prevSelected.includes(Transaction_id)
+        ? prevSelected.filter((id) => id !== Transaction_id)
+        : [...prevSelected, Transaction_id]
+    );
+  };
+
   return (
     <>
       <div className="flex flex-col">
@@ -180,6 +220,14 @@ const Transactions = () => {
               <th className="p-2">Balance</th>
               <th className="p-2">Category</th>
               <th className="p-2">Category Id</th>
+              <th className="p-2">
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded"
+                  onClick={deleteTransaction}
+                >
+                  Delete
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -198,6 +246,12 @@ const Transactions = () => {
                   <td className="p-2 border">{transaction.Balance}</td>
                   <td className="p-2 border">{transaction.Category}</td>
                   <td className="p-2 border">{transaction.Category_id}</td>
+                  <td className="p-2 pl-8 border">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleSelect(transaction.Transaction_id)}
+                    />
+                  </td>
                 </tr>
               ))
             ) : (
