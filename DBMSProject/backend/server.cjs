@@ -174,7 +174,7 @@ app.get("/api/searchTransactions", (req, res) => {
   });
 });
 
-app.put("/api/addTransaction", (req, res) => {
+app.post("/api/addTransaction", (req, res) => {
   const {
     Transaction_id,
     Account_id,
