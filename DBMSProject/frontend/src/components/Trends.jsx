@@ -30,6 +30,8 @@ ChartJS.register(
 const Trends = () => {
   const [startDate, setStartDate] = useState(new Date(2024, 0));
   const [endDate, setEndDate] = useState(new Date(2024, 9));
+  const [barStartDate, setBarStartDate] = useState(new Date(2024, 0));
+  const [barEndDate, setBarEndDate] = useState(new Date(2024, 9));
   const [allTransactions, setAllTransactions] = useState([]);
   const [spendingVSIncome, setSpendingVSIncome] = useState([]);
   const [chartOptions, setChartOptions] = useState({
@@ -147,6 +149,51 @@ const Trends = () => {
     }
   };
 
+  // Adjust date range by moving months forward or backward
+  const adjustBarChartDateRange = (direction, end) => {
+    if (end == "beginning") {
+      const newStartDate = new Date(
+        barStartDate.getFullYear(),
+        barStartDate.getMonth() + direction
+      );
+      setBarStartDate(newStartDate);
+      // set new chart start date
+      setBarChartOptions((prevOptions) => ({
+        ...prevOptions,
+        scales: {
+          ...prevOptions.scales,
+          x: {
+            ...prevOptions.scales.x,
+            min: `${newStartDate.getFullYear()}-${String(
+              newStartDate.getMonth() + 1
+            ).padStart(2, "0")}-01`,
+          },
+        },
+      }));
+    }
+    if (end == "end") {
+      const newEndDate = new Date(
+        barEndDate.getFullYear(),
+        barEndDate.getMonth() + direction
+      );
+      setBarEndDate(newEndDate);
+      // set new chart end date
+      setBarChartOptions((prevOptions) => ({
+        ...prevOptions,
+        scales: {
+          ...prevOptions.scales,
+          x: {
+            ...prevOptions.scales.x,
+            max: `${newEndDate.getFullYear()}-${String(
+              newEndDate.getMonth() + 1
+            ).padStart(2, "0")}-01`,
+          },
+        },
+      }));
+    }
+  };
+
+
   useEffect(() => {
     const fetchSpendingVSIncome = async () => {
       try {
@@ -256,6 +303,35 @@ const Trends = () => {
       </div>
       <div className="w-[100%] h-[500px] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
         <Line data={chartData} options={chartOptions} />
+      </div>
+      <div className="w-[100%] h-[100px] bg-white font-bold text-[30px] px-6 rounded-lg mb-2 flex items-center justify-center gap-4">
+        <button
+          onClick={() => adjustBarChartDateRange(-1, "beginning")}
+          className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+        >
+          &lt;
+        </button>
+        <span>{" " + formatDate(startDate) + " "}</span>
+        <button
+          onClick={() => adjustBarChartDateRange(1, "beginning")}
+          className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+        >
+          &gt;
+        </button>
+        <span> - Income vs Spending by Month - </span>
+        <button
+          onClick={() => adjustBarChartDateRange(-1, "end")}
+          className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+        >
+          &lt;
+        </button>
+        <span>{" " + formatDate(endDate) + " "}</span>
+        <button
+          onClick={() => adjustBarChartDateRange(1, "end")}
+          className="cursor-pointer bg-teal-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg"
+        >
+          &gt;
+        </button>
       </div>
       <div className="w-[100%] bg-[#ffffff] font-bold text-[30px] px-6 rounded-lg mb-2 pt-10">
         <Bar data={barChartData} options={barChartOptions} />
