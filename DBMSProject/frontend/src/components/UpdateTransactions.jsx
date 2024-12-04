@@ -36,7 +36,8 @@ const UpdateTransactions = () => {
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to Update transaction.");
+        const errorData = await response.json(); // Parse error response
+        throw new Error(errorData.message || "Failed to update transaction.");
       }
       const data = await response.json();
       setStatusMessage({
