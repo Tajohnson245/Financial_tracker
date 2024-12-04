@@ -12,6 +12,7 @@ const Goals = () => {
 
   const [formData2, setFormData2] = useState({
     Goal_id: "",
+    Account_id: "",
     Goal_Name: "",
     Target_amount: "",
     Current_amount: "",
