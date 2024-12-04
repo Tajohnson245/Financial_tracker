@@ -48,7 +48,6 @@ function App() {
                 </>
               }
             />
-            <Route path="/test" element={<div>Test Page</div>} />
             <Route
               path="/"
               element={<div>Welcome to the Financial Tracker</div>}

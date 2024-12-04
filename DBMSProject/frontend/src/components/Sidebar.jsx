@@ -45,11 +45,6 @@ const Sidebar = () => {
             Trends
           </div>
         </Link>
-        <Link to="/test">
-          <div className="button bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg mb-2">
-            Test
-          </div>
-        </Link>
 
         {showAdditionalInfo && (
           <div
