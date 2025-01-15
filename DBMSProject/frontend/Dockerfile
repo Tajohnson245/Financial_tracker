@@ -1,5 +1,10 @@
 FROM node:20.15.0
 
+RUN addgroup --system <group>
+RUN adduser --system <user> --ingroup <group>
+USER <user>:<group>
+
+
 WORKDIR /app
 
 # Copy only the package files first to leverage Docker's cache
